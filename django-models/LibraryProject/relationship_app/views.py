@@ -3,7 +3,8 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic import DetailView
-from .models import Book, Library
+from .models import Book
+from .models import Library
 # Create your views here.
 
 def list_books(request):
