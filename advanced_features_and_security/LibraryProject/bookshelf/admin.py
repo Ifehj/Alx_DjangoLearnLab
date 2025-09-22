@@ -3,7 +3,7 @@ from .models import Book, CustomUser
 from django.contrib.auth.admin import UserAdmin
 
 
-admin.site.register(Book, CustomUser)
+
 class BookAdmin(admin.ModelAdmin):
     # columns to show in the list view
     list_display = ('title', 'author', 'publication_year')
@@ -46,3 +46,6 @@ class CustomUserAdmin(UserAdmin):
 
     search_fields = ("username", "email")
     ordering = ("username",)
+
+admin.site.register(Book)
+admin.site.register(CustomUser, CustomUserAdmin)
