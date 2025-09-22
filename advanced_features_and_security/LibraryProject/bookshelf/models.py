@@ -13,7 +13,7 @@ class Book(models.Model):
         return f"{self.title} by {self.author} ({self.publication_year})"
 
 
-class UserManager(BaseUserManager):
+class CustomUserManager(BaseUserManager):
     """Manager for custom user model with email login"""
 
     def create_user(self, username, email=None, password=None, **extra_fields):
