@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Book list</title>
+  </head>
+  <body>
+    <h1>Books</h1>
+    <ul>
+      {% for book in books %}
+      <li>
+        {{ book.title }} — {{ book.author }} ({{ book.publication_year }})
+      </li>
+      {% empty %}
+      <li>No books found.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
