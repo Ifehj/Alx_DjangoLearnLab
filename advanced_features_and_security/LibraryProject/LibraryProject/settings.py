@@ -131,7 +131,10 @@ AUTH_USER_MODEL = "bookshelf.CustomUser"
 SECURE_BROWSER_XSS_FILTER = True  # Helps prevent reflected XSS
 X_FRAME_OPTIONS = "DENY"  # Prevents clickjacking
 SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevents MIME-type sniffing
-
+SECURE_SSL_REDIRECT = True  # Redirect all non-HTTPS requests to HTTPS
+SECURE_HSTS_SECONDS = 31536000  # Enforce HTTPS for the next hour
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allow site to be included in browsers' HSTS preload list
 # Ensure cookies are sent only over HTTPS
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
