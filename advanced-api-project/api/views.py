@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from .serializers import BookSerializer
 from rest_framework import generics
 from .models import Book
