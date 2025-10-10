@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 	'django_filters',
     'rest_framework',
 	'api',
+	'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -126,12 +127,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',  # detailed per-model permissions
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
-	
-	'DEFAULT_FILTER_BACKENDS': [
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+		'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
-    ]
+    ],
 }
