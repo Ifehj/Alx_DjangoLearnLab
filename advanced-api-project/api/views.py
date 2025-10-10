@@ -1,13 +1,14 @@
 from django.shortcuts import render
-from rest_framework import generics, permissions
-from .models import Book
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from .serializers import BookSerializer
+from rest_framework import generics
+from .models import Book
 # Create your views here.
 
 class ListView(generics.ListAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [AllowAny]
 
 	filter_backends = [filter.SearchFilter]
 	search_fields = ['title', 'author_name']
@@ -15,18 +16,18 @@ class ListView(generics.ListAPIView):
 class DetailView(generics.RetrieveAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	permission_classes = [permissions.AllowAny]
+	permission_classes = [AllowAny]
 
 class CreateView(generics.CreateAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
 class UpdateView(generics.UpdateAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 class DeleteView(generics.DestroyAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
-	permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [IsAuthenticated]
