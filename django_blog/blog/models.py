@@ -11,3 +11,12 @@ class Post(models.Model):
 
 	def __str__(self):
 		return self.title
+
+class Profile(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	bio = models.TextField(max_length=500, blank=True)
+	website = models.URLField(blank=True)
+	location = models.CharField(max_length=30, blank=True)
+
+	def __str__(self):
+		return f'Profile({self.user.username})'
