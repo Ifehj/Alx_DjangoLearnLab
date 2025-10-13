@@ -111,7 +111,7 @@ class CommentCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'blog/comment_form.html'  # used if user visits create page directly
 
     def form_valid(self, form):
-        post_pk = self.kwargs.get('post_pk')
+        post_pk = self.kwargs.get('pk')
         post = get_object_or_404(Post, pk=post_pk)
         form.instance.post = post
         form.instance.author = self.request.user

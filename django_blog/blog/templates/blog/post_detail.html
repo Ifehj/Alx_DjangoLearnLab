@@ -29,7 +29,7 @@
 <section id="add-comment">
   {% if user.is_authenticated %}
     <h4>Leave a comment</h4>
-    <form method="post" action="{% url 'comment-create' post_pk=post.pk %}">
+    <form method="post" action="{% url 'comment-create' pk=post.pk %}">
       {% csrf_token %}
       {{ comment_form.as_p }}
       <button type="submit">Post Comment</button>

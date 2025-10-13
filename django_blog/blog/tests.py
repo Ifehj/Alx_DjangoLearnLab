@@ -45,10 +45,6 @@ class PostCRUDTests(TestCase):
         resp = self.client.get(reverse('post-update', kwargs={'pk': self.post.pk}))
         self.assertEqual(resp.status_code, 200)
         
-from django.test import TestCase
-from django.urls import reverse
-from django.contrib.auth.models import User
-from .models import Post, Comment
 
 class CommentTests(TestCase):
     def setUp(self):
@@ -58,11 +54,11 @@ class CommentTests(TestCase):
 
     def test_create_comment_requires_login(self):
         # unauthenticated -> redirect to login
-        resp = self.client.post(reverse('comment-create', kwargs={'post_pk': self.post.pk}), {'content': 'Hello'})
+        resp = self.client.post(reverse('comment-create', kwargs={'pk': self.post.pk}), {'content': 'Hello'})
         self.assertNotEqual(resp.status_code, 200)
         # login and create
         self.client.login(username='other', password='pass1234')
-        resp = self.client.post(reverse('comment-create', kwargs={'post_pk': self.post.pk}), {'content': 'Hello'}, follow=True)
+        resp = self.client.post(reverse('comment-create', kwargs={'pk': self.post.pk}), {'content': 'Hello'}, follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(self.post.comments.filter(content='Hello').exists())
 
