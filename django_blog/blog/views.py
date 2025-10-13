@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import CustomUserCreationForm, ProfileForm, PostForm
+from .forms import CustomUserCreationForm, ProfileForm, PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from .models import Profile, Post
+from .models import Profile, Post, Comment
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
+
 
 
 
@@ -63,6 +65,11 @@ class PostDetailView(generic.DetailView):
 	template_name = 'blog/post_detail.html'
 	content_object_name = 'post'
 
+	def get_context_data(self, **kwargs):
+		ctx = super().get_context_data(**kwargs)
+		ctx['comment_form'] = CommentForm()
+		return ctx
+
 class PostCreateView(LoginRequiredMixin, generic.CreateView):
 	model = Post
 	form_class = PostForm
@@ -98,3 +105,43 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView
         return post.author == self.request.user
 	
 	
+class CommentCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'  # used if user visits create page directly
+
+    def form_valid(self, form):
+        post_pk = self.kwargs.get('post_pk')
+        post = get_object_or_404(Post, pk=post_pk)
+        form.instance.post = post
+        form.instance.author = self.request.user
+        messages.success(self.request, "Your comment has been posted.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()  # redirects to post detail
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def form_valid(self, form):
+        messages.success(self.request, "Comment updated.")
+        return super().form_valid(form)
+
+    def test_func(self):
+        comment = self.get_object()
+        return comment.author == self.request.user
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+
+    def get_success_url(self):
+        # redirect back to post detail after deletion
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.post.pk})
+
+    def test_func(self):
+        comment = self.get_object()
+        return comment.author == self.request.user
