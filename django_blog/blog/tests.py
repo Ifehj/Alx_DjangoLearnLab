@@ -90,7 +90,7 @@ class TagSearchTests(TestCase):
         self.post2.tags.add(t2)
 
     def test_posts_by_tag(self):
-        resp = self.client.get(reverse('posts-by-tag', kwargs={'tag_name': 'python'}))
+        resp = self.client.get(reverse('posts-by-tag', kwargs={'tag_slug': 'python'}))
         self.assertEqual(resp.status_code, 200)
         # both post1 and post2 have 'python' tag => at least post2 present
         self.assertContains(resp, 'Python news')
