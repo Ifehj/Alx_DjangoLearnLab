@@ -144,7 +144,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteV
         comment = self.get_object()
         return comment.author == self.request.user
 
-class PostsByTagListView(generic.ListView):
+class PostByTagListView(generic.ListView):
     model = Post
     template_name = 'blog/posts_by_tag.html'
     context_object_name = 'posts'
