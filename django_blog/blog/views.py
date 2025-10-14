@@ -9,6 +9,8 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.db.models import Q
+from taggit.models import Tag
+
 
 # Create your views here.
 
@@ -151,13 +153,15 @@ class PostByTagListView(generic.ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        tag_name = self.kwargs.get('tag_name')
-        return Post.objects.filter(tags__name__iexact=tag_name).order_by('-published_date')
+        tag_slug = self.kwargs.get('tag_slug')
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        return Post.objects.filter(tags__in=[tag])
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['tag_name'] = self.kwargs.get('tag_name')
-        return ctx
+        context = super().get_context_data(**kwargs)
+        tag_slug = self.kwargs.get('tag_slug')
+        context['tag'] = get_object_or_404(Tag, slug=tag_slug)
+        return context
 
 # Search view
 class PostSearchView(generic.ListView):

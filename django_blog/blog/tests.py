@@ -83,11 +83,10 @@ class TagSearchTests(TestCase):
         self.user = User.objects.create_user(username='u', password='p')
         self.post1 = Post.objects.create(title='Django tips', content='stuff', author=self.user)
         self.post2 = Post.objects.create(title='Python news', content='django is great', author=self.user)
+        
         # create tags
-        t1 = Tag.objects.create(name='django')
-        t2 = Tag.objects.create(name='python')
-        self.post1.tags.add(t1, t2)
-        self.post2.tags.add(t2)
+        self.post1.tags.add('django', 'python')
+        self.post2.tags.add('python')
 
     def test_posts_by_tag(self):
         resp = self.client.get(reverse('posts-by-tag', kwargs={'tag_slug': 'python'}))
