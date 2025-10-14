@@ -8,9 +8,7 @@ from django.contrib.auth import login
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-
-
-
+from django.db.models import Q
 
 # Create your views here.
 
@@ -145,3 +143,42 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteV
     def test_func(self):
         comment = self.get_object()
         return comment.author == self.request.user
+
+class PostsByTagListView(generic.ListView):
+    model = Post
+    template_name = 'blog/posts_by_tag.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        tag_name = self.kwargs.get('tag_name')
+        return Post.objects.filter(tags__name__iexact=tag_name).order_by('-published_date')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['tag_name'] = self.kwargs.get('tag_name')
+        return ctx
+
+# Search view
+class PostSearchView(generic.ListView):
+    model = Post
+    template_name = 'blog/search_results.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        q = self.request.GET.get('q', '').strip()
+        if not q:
+            return Post.objects.none()
+        # search title, content, and tag name
+        return Post.objects.filter(
+            Q(title__icontains=q) |
+            Q(content__icontains=q) |
+            Q(tags__name__icontains=q)
+        ).distinct().order_by('-published_date')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['query'] = self.request.GET.get('q', '')
+        return ctx
+

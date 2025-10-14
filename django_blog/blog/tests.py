@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import Profile, Post, Comment
+from .models import Profile, Post, Comment, Tag
 
 class AuthenticationTests(TestCase):
     def test_register_and_login(self):
@@ -77,3 +77,27 @@ class CommentTests(TestCase):
         resp = self.client.post(reverse('comment-delete', kwargs={'pk': comment.pk}), follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertFalse(Comment.objects.filter(pk=comment.pk).exists())
+
+class TagSearchTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='u', password='p')
+        self.post1 = Post.objects.create(title='Django tips', content='stuff', author=self.user)
+        self.post2 = Post.objects.create(title='Python news', content='django is great', author=self.user)
+        # create tags
+        t1 = Tag.objects.create(name='django')
+        t2 = Tag.objects.create(name='python')
+        self.post1.tags.add(t1, t2)
+        self.post2.tags.add(t2)
+
+    def test_posts_by_tag(self):
+        resp = self.client.get(reverse('posts-by-tag', kwargs={'tag_name': 'python'}))
+        self.assertEqual(resp.status_code, 200)
+        # both post1 and post2 have 'python' tag => at least post2 present
+        self.assertContains(resp, 'Python news')
+
+    def test_search_by_keyword(self):
+        resp = self.client.get(reverse('post-search') + '?q=django')
+        self.assertEqual(resp.status_code, 200)
+        # should find post1 (title) and post2 (content contains 'django')
+        self.assertContains(resp, 'Django tips')
+        self.assertContains(resp, 'Python news')

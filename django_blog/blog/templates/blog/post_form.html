@@ -1,11 +1,44 @@
 {% extends "blog/base.html" %}
-{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Post{% endblock %}
+
+{% block title %}
+  {% if form.instance.pk %}Edit{% else %}Create{% endif %} Post
+{% endblock %}
+
 {% block content %}
   <h1>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Post</h1>
+
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">{% if form.instance.pk %}Save changes{% else %}Publish{% endif %}</button>
+    <p>
+      {{ form.title.label_tag }}<br>
+      {{ form.title }}
+      {% if form.title.errors %}
+        <small style="color:red;">{{ form.title.errors }}</small>
+      {% endif %}
+    </p>
+
+    <p>
+      {{ form.content.label_tag }}<br>
+      {{ form.content }}
+      {% if form.content.errors %}
+        <small style="color:red;">{{ form.content.errors }}</small>
+      {% endif %}
+    </p>
+
+    <p>
+      {{ form.tags.label_tag }}<br>
+      {{ form.tags }}
+      <small class="text-muted">Separate tags with commas (e.g. “django, python, blog”)</small>
+      {% if form.tags.errors %}
+        <small style="color:red;">{{ form.tags.errors }}</small>
+      {% endif %}
+    </p>
+
+    <button type="submit">
+      {% if form.instance.pk %}Save changes{% else %}Publish{% endif %}
+    </button>
   </form>
+
   <p><a href="{% url 'posts-list' %}">Back to posts</a></p>
 {% endblock %}
+
