@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile, Post, Comment, Tag
 from django.urls import reverse_lazy
-from django.contrib import messages
+from taggit.forms import TagWidget
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -23,7 +23,9 @@ class ProfileForm(forms.ModelForm):
 	class Meta:
 		model = Profile
 		fields = ('bio', 'website', 'location')
-
+		widgets = {
+            'tags': TagWidget(),  
+        }
 class PostForm(forms.ModelForm):
 
 	tags = forms.CharField(
