@@ -14,10 +14,14 @@ class RegisterView(generics.CreateAPIView):
 	serializer_class = RegisterSerializer
 	
 	def create(self, request, *args, **kwargs):
+        # validate incomint data
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
+        # save user
 		user = serializer.save()
+        # create token for the user
 		token, created = Token.objects.get_or_create(user=user)
+        # return response with user data and token
 		return Response({
 			"user": UserSerializer(user).data,
 			"token": token.key
