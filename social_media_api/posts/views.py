@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework import generics
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from .permissions import IsOwnerOrReadOnly
@@ -77,3 +78,16 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+class FeedView(generics.ListAPIView):
+	"""
+	View to list posts from users that the authenticated user follows.
+	"""
+	serializer_class = PostSerializer
+	permission_classes = [permissions.IsAuthenticated]
+	pagination_class = StandardResultsSetPagination
+
+	def get_queryset(self):
+		user = self.request.user
+		followed_users = user.following.all()
+		return Post.objects.filter(author__in=followed_users).select_related('author').order_by('-created_at')

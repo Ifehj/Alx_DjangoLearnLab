@@ -35,4 +35,9 @@ class LoginSerializer(serializers.Serializer):
 			return user
 		raise serializers.ValidationError("Invalide Credentials")
 
-		
+class FollowSerializer(serializers.ModelSerializer):
+	following =UserSerializer(many=True, read_only=True)
+	followers =UserSerializer(many=True, read_only=True)
+	class Meta:
+		model = User
+		fields = ['id', 'username', 'following', 'followers']
