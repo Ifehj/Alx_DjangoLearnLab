@@ -3,7 +3,8 @@ from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import login, get_user_model
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
+from rest_framework import permissions
 from django.shortcuts import get_object_or_404
 from .models import CustomUser
 from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
@@ -45,7 +46,7 @@ class LoginView(generics.GenericAPIView):
         })
 
 class FollowUserView(generics.GenericAPIView):
-      permission_classes = [IsAuthenticated]
+      permission_classes = [permissions.IsAuthenticated]
 
       def post(self, request, user_id, *args, **kwargs):
             target = get_object_or_404(User, pk=user_id)
@@ -62,7 +63,7 @@ class FollowUserView(generics.GenericAPIView):
 
     
 class UnfollowUserView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id, *args, **kwargs):
         target = get_object_or_404(User, pk=user_id)
