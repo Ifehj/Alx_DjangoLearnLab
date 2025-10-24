@@ -10,6 +10,9 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from .permissions import IsOwnerOrReadOnly
 from notifications.utils import create_notification_for_like
+from .models import Like
+from django.shortcuts import get_object_or_404
+from notifications.models import Notification
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -22,7 +25,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().select_related('author')
     serializer_class = PostSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend,
                        filters.SearchFilter, filters.OrderingFilter]
@@ -34,18 +37,22 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def like(self, request, pk=None):
-        post = self.get_object()
+        post = generics.get_object_or_404(Post, pk=pk)
         user = request.user
         # Prevent liking your own post? up to you (often allowed but we'll notify only if actor != author)
         # check if like exists
-        like, created = Like.objects.get_or_create(post=post, user=user)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
         if not created:
             return Response({"detail": "You already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create notification for post author (if not actor)
-        if post.author != user:
-            create_notification_for_like(
-                actor=user, recipient=post.author, post=post)
+        if post.author != request.user:
+            Notification.objects.create(
+                recipient=post.author,
+                sender=request.user,
+                notification_type='like',
+                post=post
+            )
 
         serializer = LikeSerializer(like, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
